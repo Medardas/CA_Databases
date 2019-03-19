@@ -6,7 +6,7 @@
     <session-factory>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/playground?serverTimezone=UTC</property>
         <property name="hibernate.connection.username">medardas</property>
-        <property name="hibernate.connection.password">pass</property>
+        <property name="hibernate.connection.password">belekas</property>
         <property name="hibernate.connection.pool_size">1</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
