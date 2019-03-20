@@ -1,8 +1,13 @@
 package com.codeacademy;
 
+
 import com.codeacademy.model.*;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Main {
 
@@ -14,50 +19,37 @@ public class Main {
                 .addAnnotatedClass(Address.class)
                 .addAnnotatedClass(Person.class)
                 .addAnnotatedClass(Salary.class)
+                .addAnnotatedClass(Branch.class)
                 .configure();
 
         Session session = hibernateCfg.buildSessionFactory().openSession();
         session.getTransaction().begin();
 
-        Person person = new Person();
-        person.setName("Petras");
-        person.setAge(30);
-        session.save(person);
-        Salary salary = new Salary();
-        salary.setPay(1000);
-        salary.setPersonId(person.getId());
-        session.save(salary);
-
-       /* Address companyAddress = new Address();
-        companyAddress.setCity("Kaunas");
-        companyAddress.setStreet("Laisves pr.");
-
-        Employee employee = new Employee();
-        employee.setName("John");
-        employee.setPosition("Developer");
-
         Company company = new Company();
         company.setName("Some Company name");
-        company.setAddress(companyAddress);
 
-        Address employeeAddress = new Address();
-        employeeAddress.setCity("Vilnius");
-        employeeAddress.setStreet("Gedo pr.");
+        company.setBranches(new HashSet<>());
+        Branch branch = new Branch("Some branch name");
+        branch.setCompany(company);
+        Branch branc2 = new Branch("Some other branch name");
+        branch.setCompany(company);
+        company.getBranches().addAll(List.of(branch, branc2));
 
-
-        employee.setCompany(company);
-        employee.setAddress(employeeAddress);
-
-        Contact contact = new Contact();
-        contact.setContact_type("mobile_phone");
-        contact.setValue("37000000000");
-        contact.setEmployee(employee);
-
-        session.save(contact);
-        session.save(employee);
-        session.save(company);*/
+        session.save(company);
 
         session.getTransaction().commit();
+
+
+        Set<Branch> branches = session.find(Company.class, company.getId()).getBranches();
+        for (Branch b : branches)
+            System.out.println(b.getName());
+/*
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> employeeRoot = criteriaQuery.from(Employee.class);
+        criteriaQuery.where(criteriaBuilder.equal(employeeRoot.get("name"), "Jooohn"));
+        List<Employee> employees = session.createQuery(criteriaQuery).getResultList();
+*/
 
         session.close();
     }

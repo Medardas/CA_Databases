@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
@@ -24,4 +25,7 @@ public class Employee {
     @JoinColumn(name = "company")
     private Company company;
 
+    @Transient
+    @OneToMany(mappedBy = "employee")
+    private Set<Contact> contacts;
 }

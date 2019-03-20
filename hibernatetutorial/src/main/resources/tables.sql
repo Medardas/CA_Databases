@@ -1,5 +1,6 @@
 drop table if exists Contact;
 drop table if exists Employee;
+drop table if exists Branch;
 drop table if exists Company;
 drop table if exists Address;
 
@@ -15,6 +16,13 @@ create table Company
   name    varchar(40),
   address int,
   CONSTRAINT fk_company_address FOREIGN KEY (address) REFERENCES Address (id)
+);
+create table Branch
+(
+  id      int primary key AUTO_INCREMENT,
+  name    VARCHAR(30),
+  company int,
+  CONSTRAINT fk_company_branch FOREIGN KEY (company) REFERENCES Company (id)
 );
 create table Employee
 (
