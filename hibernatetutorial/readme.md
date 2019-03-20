@@ -9,7 +9,7 @@
  * Caching
  
  ### Configuration
- Gali būti daug konfiguracijos būdu:
+ Gali būti daug konfiguracijos būdų:
  
  1. JPA konfiguracija. Ši konfiguracija skirta Java Persitance API, tačiau pakeitus `<provider>` tag'o reikšmę galima nustatinėti Hibernate konfiguraciją.  
  Tai padaryti classpath reikia turėti direktoriją/failą: META-INF/persistance.xml

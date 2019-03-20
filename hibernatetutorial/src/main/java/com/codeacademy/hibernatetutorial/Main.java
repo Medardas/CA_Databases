@@ -37,13 +37,13 @@ public class Main {
         System.out.println("Second time query took:" + milisToTime(System.currentTimeMillis() - startTime2));
 
         long startTime3 = System.currentTimeMillis();
-        Address employee3 = findAddressByStreet("jtpbbbobxxsvgtk");
-        System.out.println("Employee with id: " + employee3.getId() + " found.");
+        Address address = findAddressByStreet("jtpbbbobxxsvgtk");
+        System.out.println("Employee with id: " + address.getId() + " found.");
         System.out.println("Third time query took:" + milisToTime(System.currentTimeMillis() - startTime3));
 
         long startTime4 = System.currentTimeMillis();
-        Address employee4 = findAddressByStreet("jtpbbbobxxsvgtk");
-        System.out.println("Employee with id: " + employee4.getId() + " found.");
+        Address address2 = findAddressByStreet("jtpbbbobxxsvgtk");
+        System.out.println("Employee with id: " + address2.getId() + " found.");
         System.out.println("Fourth time query took:" + milisToTime(System.currentTimeMillis() - startTime4));
 
         session.close();
