@@ -4,6 +4,9 @@
  * Entity
  * Entity Mapping
  * Persistence
+ * HQL
+ * Criteria
+ * Caching
  
  ### Configuration
  Gali būti daug konfiguracijos būdu:
@@ -173,3 +176,110 @@ Taigi norint daryti update, insert ir delete komandas - jas būtina daryti dar a
 `Select` tipo statement'am tai nebūtina, galima tiesiog naudoti funkcijas tokias kaip `session.find(class, id)`
 
 Atsijungimas nuo duombazės visiškai yra tvarkomas kaip sesijos uždarymas: `session.close();`;
+
+### HQL - Hibernate Query Language
+
+Tai yra į objektus orentuota užklaušų kalba (object-oriented query language) kuri yra panaši į SQL tačiau vietoj lentelių
+ir stulpelių ji dirba su objektais ir jų field'ais. Hibernate išverčia šiuos objektus į standartinę SQL užklausą ir siunčia tai į duombazę.
+IntelliJ netgi gali debuginti šitas užklausas java failuose.
+
+Nors per Hibernate galima leisti ir Native SQL užklausas, naudodami HQL mes galime naudotis hibernate caching galimybėmis ir šiek tiek mažiau nerimauti apie
+teisingas užklausas. 
+
+Lentelių ir field'u pavadinimai yra case sensitive, tačiau SQL raktažodžiai nėra.
+```java
+String hql = "FROM Employee";
+Query query = session.createQuery(hql);
+List<Employee> results = query.list();
+```
+Tokia programa pirmoje eilutėje nusako su kokiu objektu reikia dirbti (`Employee`), tuomet antroje - sukurti SQL užklausą iš hibernate sesijos
+ir paskutinis dalykas yra iškviesti `list()` metoda kuris gražina paprastą SQL (`SELECT * FROM Employee`) rezultatą kaip sąrašą.
+
+Lygiai toks pats rezultatas būtu su:
+
+```java
+String hql = "FROM com.codeacademy.hibernatetutorial.model.Employee";
+Query query = session.createQuery(hql);
+List<com.codeacademy.hibernatetutorial.model.Employee> results = query.list();
+```
+Tokiu būdu galima sukurti praktiškai betkokią HQL užklausą visom CRUD operacijoms. Reikia atsiminti, kad tai yra tas pats kas SQL tik dirbant su objektais ir jų field'ais reikia galvoti apie juos kaip apie stalus ir
+stulpelius tiesiogiai.
+
+##### Named parameters
+
+HQL užklausose galima nustatinėti parametrus:
+```java
+String hql = "FROM Employee E WHERE E.id = :employee_id";
+Query query = session.createQuery(hql);
+query.setParameter("employee_id",10);
+List results = query.list();
+```
+
+Tokiu būdu sugalvojame parametro pavadinimą ir idedame jį su dvidatškiu, kad hibernate suprastu tai kaip parametrą (`:employee_id`)
+Tuomet nustatyti parametro reikšmę galima programiniu būdu `query.setParameter("employee_id",10);`
+
+### Criteria
+
+Criteria yra  objektas kuris gali per programines funkcijas sukurti kompleksią užklausą kuri po to išverčiama į SQL kalbą.
+Hibernate į inicijuoti kriterijų galima taip:
+```java
+CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
+Root<Employee> employeeRoot = criteriaQuery.from(Employee.class);
+criteriaQuery.where(criteriaBuilder.equal(employeeRoot.get("name"), "Jooohn"));
+List<Employee> employees = session.createQuery(criteriaQuery).getResultList();
+```
+Čia pirmiausia sukuriamas `CriteriaBuilder` objektas kuris gali sukurti užklausas ir jose lyginti loginius paramtrus.
+Užklausos yra kuriamos (`CriteriaQuery`) remiantis kažkokia lentele, kadangi mes norim sužinoti apie `Employee`, mes nurodome atitinkamos `Enity` klase 
+ir sukuriam `SELECT` užklausą (krierijai gali būti tik užklausose `SELECT`, `DELETE` ir `UPDATE`. `INSERT` logiškai neturi kriterijų) su kriterijais link `Employee` entity. Prie šio objekto veliau bus pridedami papildomi kriterijai užklausai.<br>
+Kitas objektas kurį sukuriam yra `Employee` objektas kaip užklausos dalis. tai reiškia šį objektą galima 
+naudoti kai norima nustatyti kokiam stulpeliui kriterijus turi tikti. Stulpelį galima nurodyti iškviečiant `employeeRoot.get(<column_name>)`, tai yra objektas prie kurio yra kabinami kriterijai. Kuomet baigiama krterijų objetkas - jis paleidžiamas kaip užklausa naudojant `session.createQuery(criteriaQuery).getResultList()`;
+
+### Caching
+
+ Caching yra mechanizmas kuris šiek tiek pagreitina užklausų rezultatų gavima. Tai yra sistema kuri egzistuoja tarp aplikacijos ir duombazės
+ ir saugo najausias užklausas atėjusias iš kliento. Jei nepraeina labai daug laiko rezultatai į tokias pačias naujas užklausas yra gražinami tiesiai iš cache ir nėra ištikrųjų siunčiami į duombazę taip sutaupant daug laiko.
+ 
+ ![communication using hibernate](https://i.imgur.com/APtFgNZ.jpg) 
+ 
+ ##### 1. First-level cache
+ 
+ Šis cache lygis yra `Session` objekto lygije, tai yra visos dar nekommitintos transakcijos.
+ 
+ ##### 2. Second-level cache
+ 
+ Tai yra antro lygio cache kuri galima sukonfiguruoti laikyti tik tam tikro `Entity` detales, užklausas, taip pat galima 
+ pasirūpinti, kad cache būtų išsaugotas net ir išnaujo prisijungus naudojant tą patį `Session` objektą.
+ 
+ Prieš įjungiant second-level caching pirmiausia turim nutarti kelis dalykus.
+ Reikia išsirinkti `Concurrency Strategy` tai yra algoritmas kurį pasirinksim manipuliuoti objektams duombazėje:
+ 
+ * Transactional - strategija geriausia dažniausiai skaitomam objektui su retais updates. 
+ * Read-write - Panaši į transactional. Skirta greitai skaityti objektus kuriuos retai keičia. 
+ * Nonstrict-read-write - ši strategija niekada negarantuoja, kad cache ir duombazės įrašai bus visada vienodi, todėl ši strategija gera tik objektam kuriuos retai skaitom.
+ * Read-only - strategija geriausia tik objektam kuriuos dažniausiai tiesiog skaitom ir niekad nekeičiam.
+ 
+ Taigi jei norėtume pridėti `Read-Write` strategijos second-level cache prie Entity objekto darytume taip:
+ ```java
+@Entity
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Employee{<..>
+```
+Kitas dalykas kurį reikia išsirinkti yra `Cach Provider`. Tai yra klasė kuri pasirūpina pačiu "kešavimu" (chaching), tai yra saugo atmintyje užklausas ir gražina jų rezultatus jei nauja užklausa pakankamai nauja.
+Yra keli cache providers:
+* EHCache
+* OSCache
+* SwarmCache
+* Jboss Cache
+
+Ne kiekvienas provideris palaiko visas concurrency strategijas. Iš išvardintų tik EHCache ir OSCache palaiko `Read-Write`.
+Taigi norit pridėti EHCache klasę į konfiguracijos (hibernate.cfg.xml) failą pridedam tokiąreikšmę:
+```xml
+<property name = "hibernate.cache.provider_class">
+         org.hibernate.cache.EhCacheProvider
+</property>
+```
+arba į hibernate.properties: `hibernate.cache.provider_class=org.hibernate.cache.EhCacheProvider`
+
+Tokiu būdu mes įjungėm second-level caching valdoma EHCache providerio su Employee objektu skaitymu tvarkomo `read-write` concurrency strategy tipo algoritmu.
+

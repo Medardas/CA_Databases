@@ -7,13 +7,13 @@ drop table if exists Address;
 create table Address
 (
   id     int primary key AUTO_INCREMENT,
-  street varchar(40),
+  street varchar(40) unique,
   city   varchar(30)
 );
 create table Company
 (
   id      int primary key AUTO_INCREMENT,
-  name    varchar(40),
+  name    varchar(40) UNIQUE,
   address int,
   CONSTRAINT fk_company_address FOREIGN KEY (address) REFERENCES Address (id)
 );
@@ -27,7 +27,7 @@ create table Branch
 create table Employee
 (
   id       int primary key AUTO_INCREMENT,
-  name     varchar(40),
+  name     varchar(40) UNIQUE,
   position varchar(30),
   company  int,
   address  int,
@@ -42,3 +42,4 @@ create table Contact
   value        varchar(40),
   CONSTRAINT fk_contact_Person FOREIGN KEY (ref_id) REFERENCES Employee (id)
 );
+CREATE UNIQUE INDEX employee_name ON Employee (name);

@@ -1,4 +1,4 @@
-package com.codeacademy.model;
+package com.codeacademy.hibernatetutorial.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
