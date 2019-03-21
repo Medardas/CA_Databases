@@ -244,7 +244,16 @@ naudoti kai norima nustatyti kokiam stulpeliui kriterijus turi tikti. Stulpelį 
  
  ##### 1. First-level cache
  
- Šis cache lygis yra `Session` objekto lygije, tai yra visos dar nekommitintos transakcijos.
+ Šis cache lygis yra `Session` objekto lygije. Keli dalykai žinoti apie 1st level cache:
+  1. Hibernate First Level Cache yra įjungta automatiškai, tam konfiguracijos nereikia.
+  2. Šis cache yra specifiškas sesijai. Pavyzdžiui dėl to jei du kartus iš eilės padarysim tą patį`session.find()`
+  antrą kartą užklausa nebus išsiųsta į duombazę, tačiau jei naujoje sesijoje paleisim tą pačia užklausa iškarto - ji bus išsiųsta.
+  3. Hibrenate First Level Cache glai turėti senų reikšmių.
+  4. Galima naudoti šiuos sesijos metodus, kad manipuliuoti cache:
+     * `evict(Object)` - išmesti tam tikrą objektą.
+     * `clear()` - išvalyti viską.
+     * `contains(Object)` - patikrina ar tam tikras objektas yra cache. Gražina boolean.
+  5. Kadangi hibernate saugo *visas* užklausas darant daug pakeitimų, `bulk updates`, kai masiškai keičiami įrašai - būtina pravalyti cache dėl galimų atminties problemų.
  
  ##### 2. Second-level cache
  
