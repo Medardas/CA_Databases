@@ -16,17 +16,32 @@ import java.util.*;
 
 public class Main {
 
-    private static final String COMPANY_1 = "PROGRAMUOK";
-    private static final String BRANCH_1 = "Sunrise valley";
-    private static final String BRANCH_2 = "Tech Park";
+    private static final String COMPANY_1 = "PROGRAMUOK 1";
+    private static final String BRANCH_1 = "Sunrise valley 1";
+    private static final String BRANCH_2 = "Tech Park 1";
     private static final int HOW_MANY = 100000;
     static Session session = createAndOpenSession();
 
     public static void main(String[] theory) throws Exception {
         //    createNEmployees(HOW_MANY);
 
+        session.getTransaction().begin();
+        saveCompanyWith2Branches();
 
-        long startTime = System.currentTimeMillis();
+  /*      session.getTransaction().begin();;
+        Employee employee = createEmployeeInCompany(getCompany());
+        session.save(employee);
+
+        Contact contact = new Contact();
+        contact.setContact_type("mobile phone");
+        contact.setValue("370");
+        contact.setEmployee(employee);
+
+        employee.getContacts().add(contact);
+        session.save(employee);*/
+
+        session.getTransaction().commit();
+        /*long startTime = System.currentTimeMillis();
         Employee employee = findEmployeeByName("jchuegecinlyjcc");
         System.out.println("Employee with id: " + employee.getId() + " found.");
         System.out.println("First time query took: " + milisToTime(System.currentTimeMillis() - startTime));
@@ -44,7 +59,7 @@ public class Main {
         long startTime4 = System.currentTimeMillis();
         Address address2 = findAddressByStreet("jtpbbbobxxsvgtk");
         System.out.println("Employee with id: " + address2.getId() + " found.");
-        System.out.println("Fourth time query took:" + milisToTime(System.currentTimeMillis() - startTime4));
+        System.out.println("Fourth time query took:" + milisToTime(System.currentTimeMillis() - startTime4));*/
 
         session.close();
     }
@@ -69,9 +84,11 @@ public class Main {
         clearEmployees(0);
         Company company = getCompany();
         long startTime = System.currentTimeMillis();
-        session.getTransaction().begin();
+        Set<Employee> employees = new HashSet<>();
         for (int i = 0; i < N; i++)
-            session.save(createEmployeeInCompany(company));
+            employees.add(createEmployeeInCompany(company));
+        session.getTransaction().begin();
+        session.save(employees);
         session.getTransaction().commit();
         System.out.println("Time took to enter " + N + " entries: " + milisToTime(System.currentTimeMillis() - startTime));
     }
@@ -170,7 +187,7 @@ public class Main {
         return buffer.toString();
     }
 
-    private static void saveCompanyWIth2Branches() {
+    private static void saveCompanyWith2Branches() {
         Company company = new Company();
         company.setName(COMPANY_1);
 

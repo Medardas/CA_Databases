@@ -2,9 +2,11 @@ package com.codeacademy.hibernatetutorial.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,7 +29,13 @@ public class Employee {
     @JoinColumn(name = "company")
     private Company company;
 
-    @Transient
-    @OneToMany(mappedBy = "employee")
+
+    @Setter
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<Contact> contacts;
+
+    public Set<Contact> getContacts() {
+        return contacts == null ? new HashSet<>() : contacts;
+    }
+
 }
