@@ -67,6 +67,14 @@
             <artifactId>ehcache</artifactId>
             <version>3.7.0</version>
         </dependency>
+
+        <!--In memory database-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

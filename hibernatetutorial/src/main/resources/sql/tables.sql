@@ -42,4 +42,17 @@ create table Contact
   value        varchar(40),
   CONSTRAINT fk_contact_Person FOREIGN KEY (ref_id) REFERENCES Employee (id)
 );
-CREATE UNIQUE INDEX employee_name ON Employee (name);
+
+
+insert into Address(street, city)
+values ('Gedo pr.', 'Vilnius');
+insert into Address(street, city)
+values ('Laisves al.', 'Kaunas');
+insert into Company(name, address)
+values ('Microsoft', 1);
+insert into Employee(name, position, company, address)
+values ('Jonas', 'developer', 1, 2);
+insert into Branch (name, company)
+values ('Vilnius HQ', 1);
+insert into Contact (ref_id, contact_type, value)
+values (1, 'mobile phone', '370');

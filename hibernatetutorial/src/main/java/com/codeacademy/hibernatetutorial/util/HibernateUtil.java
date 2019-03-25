@@ -13,7 +13,7 @@ public class HibernateUtil {
 
     private static Logger logger = Logger.getLogger(HibernateUtil.class);
 
-    private static SessionFactory buildSessionFactory() {
+    private static SessionFactory buildSessionFactory(String config) {
         try {
             Configuration configuration = new Configuration()
                     .addAnnotatedClass(Company.class)
@@ -23,7 +23,7 @@ public class HibernateUtil {
                     .addAnnotatedClass(Person.class)
                     .addAnnotatedClass(Salary.class)
                     .addAnnotatedClass(Branch.class);
-            configuration.configure("hibernate.cfg.xml");
+            configuration.configure(config == null ? "hibernate.cfg.xml" : config);
 
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 
@@ -37,8 +37,8 @@ public class HibernateUtil {
         }
     }
 
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) sessionFactory = buildSessionFactory();
+    public static SessionFactory getSessionFactory(String config) {
+        if (sessionFactory == null) sessionFactory = buildSessionFactory(config);
         return sessionFactory;
     }
 }
