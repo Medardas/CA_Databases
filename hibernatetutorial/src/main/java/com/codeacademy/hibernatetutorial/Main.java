@@ -4,45 +4,48 @@ package com.codeacademy.hibernatetutorial;
 import com.codeacademy.hibernatetutorial.model.*;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Query;
+import org.hibernate.stat.Statistics;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.codeacademy.hibernatetutorial.util.EntityCreator.*;
+
 public class Main {
 
-    private static final String COMPANY_1 = "PROGRAMUOK 1";
-    private static final String BRANCH_1 = "Sunrise valley 1";
-    private static final String BRANCH_2 = "Tech Park 1";
     private static final int HOW_MANY = 100000;
     static Session session = createAndOpenSession();
 
     public static void main(String[] theory) throws Exception {
         //    createNEmployees(HOW_MANY);
 
-        session.getTransaction().begin();
-        saveCompanyWith2Branches();
+        Employee employee = createEmployeeInCompany();
+        Statistics stats = session.getSessionFactory().getStatistics();
+        stats.setStatisticsEnabled(true);
 
-  /*      session.getTransaction().begin();;
-        Employee employee = createEmployeeInCompany(getCompany());
-        session.save(employee);
-
-        Contact contact = new Contact();
+        /*Contact contact = new Contact();
         contact.setContact_type("mobile phone");
         contact.setValue("370");
         contact.setEmployee(employee);
+*/
+        //employee.getContacts().add(contact);
+        session.getTransaction().begin();
+        session.save(employee);
 
-        employee.getContacts().add(contact);
-        session.save(employee);*/
+        Employee employee2 = findEmployeeByName("wfgwtpqmmivbamm");
+
+        Map cacheEntries = stats.getSecondLevelCacheStatistics("employee")
+                .getEntries();
 
         session.getTransaction().commit();
+
+        System.out.println("cache entries: " + cacheEntries.get(0));
         /*long startTime = System.currentTimeMillis();
-        Employee employee = findEmployeeByName("jchuegecinlyjcc");
+
         System.out.println("Employee with id: " + employee.getId() + " found.");
         System.out.println("First time query took: " + milisToTime(System.currentTimeMillis() - startTime));
 
@@ -80,13 +83,13 @@ public class Main {
         return session.createQuery(criteriaFindByStreet).getSingleResult();
     }
 
-    private static void createNEmployees(int N) {
-        clearEmployees(0);
-        Company company = getCompany();
+    private static void createNEmployees(Session session, int N) {
+        clearEmployees(session, 0);
+        Company company = getCompany(session);
         long startTime = System.currentTimeMillis();
         Set<Employee> employees = new HashSet<>();
         for (int i = 0; i < N; i++)
-            employees.add(createEmployeeInCompany(company));
+            employees.add(createEmployeeInCompany(/*company*/));
         session.getTransaction().begin();
         session.save(employees);
         session.getTransaction().commit();
@@ -100,64 +103,7 @@ public class Main {
         return formatter.format(date);
     }
 
-    private static void clearEmployees(int deleteFromIds) {
-        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-        CriteriaDelete<Employee> criteriaDelete = criteriaBuilder.createCriteriaDelete(Employee.class);
-        Root<Employee> root = criteriaDelete.from(Employee.class);
-        criteriaDelete.where(criteriaBuilder.greaterThanOrEqualTo(root.get("id"), deleteFromIds));
-        session.getTransaction().begin();
-        session.createQuery(criteriaDelete).executeUpdate();
-        session.getTransaction().commit();
-    }
 
-    private static Company getCompany() {
-        Company company = findByName(COMPANY_1);
-        if (company == null) {
-            company = createCompany(COMPANY_1);
-            save(company);
-        }
-        return company;
-    }
-
-    private static Employee createEmployeeInCompany(Company company) {
-        Employee employee = new Employee();
-        employee.setCompany(company);
-        Address address = new Address();
-        address.setStreet(randomString());
-        address.setCity("Vilnius");
-        employee.setAddress(address);
-        employee.setPosition("Developer");
-        employee.setName(randomString());
-        return employee;
-    }
-
-    private static void save(Object o) {
-        session.getTransaction().begin();
-        session.save(o);
-        session.getTransaction().commit();
-    }
-
-    private static Company createCompany(String companyName) {
-        Address companyAddress = new Address();
-        companyAddress.setCity("Vilnius");
-        companyAddress.setStreet("Sunrise valley");
-
-        Company company = new Company();
-        company.setName(companyName);
-        company.setAddress(companyAddress);
-
-        return company;
-    }
-
-    private static Company findByName(String companyName) {
-        Query companyByName = session.createQuery("from Company c where c.name=:companyName");
-        companyByName.setParameter("companyName", companyName);
-        try {
-            return (Company) companyByName.list().stream().findFirst().get();
-        } catch (RuntimeException re) {
-            return null;
-        }
-    }
 
     private static Session createAndOpenSession() {
         Configuration hibernateCfg = new Configuration()
@@ -171,34 +117,6 @@ public class Main {
                 .configure();
 
         return hibernateCfg.buildSessionFactory().openSession();
-    }
-
-    private static String randomString() {
-        int leftLimit = 97; // letter 'a'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 15;
-        Random random = new Random();
-        StringBuilder buffer = new StringBuilder(targetStringLength);
-        for (int i = 0; i < targetStringLength; i++) {
-            int randomLimitedInt = leftLimit + (int)
-                    (random.nextFloat() * (rightLimit - leftLimit + 1));
-            buffer.append((char) randomLimitedInt);
-        }
-        return buffer.toString();
-    }
-
-    private static void saveCompanyWith2Branches() {
-        Company company = new Company();
-        company.setName(COMPANY_1);
-
-        company.setBranches(new HashSet<>());
-        Branch branch = new Branch(BRANCH_1);
-        branch.setCompany(company);
-        Branch branch2 = new Branch(BRANCH_2);
-        branch2.setCompany(company);
-        company.getBranches().addAll(List.of(branch, branch2));
-
-        session.save(company);
     }
 
     private static void printByCriteria() {

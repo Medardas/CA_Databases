@@ -4,14 +4,27 @@
         "http://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/playground?serverTimezone=UTC</property>
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/caching?serverTimezone=UTC&amp;useSSL=false</property>
         <property name="hibernate.connection.username">medardas</property>
         <property name="hibernate.connection.password">belekas</property>
-        <property name="hibernate.connection.pool_size">1</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.generate_statistics">true</property>
+        <property name="hibernate.cache.use_structured_entries">true</property>
+
+        <!-- POOL MANAGEMENT -->
+        <property name="hibernate.c3p0.min_size">1</property>
+        <property name="hibernate.c3p0.max_size">2</property>
+
+        <!--CACHE CONFIG-->
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.jcache.JCacheRegionFactory</property>
+        <property name="hibernate.javax.cache.provider">org.ehcache.jsr107.EhcacheCachingProvider</property>
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.javax.cache.missing_cache_strategy">create</property>
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="net.sf.ehcache.configurationResourceName">/ehcacheconfig.xml</property>
 
     </session-factory>
 </hibernate-configuration>

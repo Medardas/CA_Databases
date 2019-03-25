@@ -263,12 +263,15 @@ naudoti kai norima nustatyti kokiam stulpeliui kriterijus turi tikti. Stulpelį 
  Prieš įjungiant second-level caching pirmiausia turim nutarti kelis dalykus.
  Reikia išsirinkti `Concurrency Strategy` tai yra algoritmas kurį pasirinksim manipuliuoti objektams duombazėje:
  
- * Transactional - strategija geriausia dažniausiai skaitomam objektui su retais updates. 
- * Read-write - Panaši į transactional. Skirta greitai skaityti objektus kuriuos retai keičia. 
- * Nonstrict-read-write - ši strategija niekada negarantuoja, kad cache ir duombazės įrašai bus visada vienodi, todėl ši strategija gera tik objektam kuriuos retai skaitom.
- * Read-only - strategija geriausia tik objektam kuriuos dažniausiai tiesiog skaitom ir niekad nekeičiam.
+ * read-only - A read-only cache is good for data that needs to be read often but not modified. It is simple, performs well, and is safe to use in a clustered environment.
+   
+ * nonstrict read-write - Some applications only rarely need to modify data. This is the case if two transactions are unlikely to try to update the same item simultaneously. In this case, you do not need strict transaction isolation, and a nonstrict-read-write cache might be appropriate. If the cache is used in a JTA environment, you must specify hibernate.transaction.manager_lookup_class. In other environments, ensore that the transaction is complete before you call Session.close() or Session.disconnect().
+   
+ * read-write - A read-write cache is appropriate for an application which needs to update data regularly. Do not use a read-write strategy if you need serializable transaction isolation. In a JTA environment, specify a strategy for obtaining the JTA TransactionManager by setting the property hibernate.transaction.manager_lookup_class. In non-JTA environments, be sure the transaction is complete before you call Session.close() or Session.disconnect().
  
+ * transactional - The transactional cache strategy provides support for transactional cache providers such as JBoss TreeCache. You can only use such a cache in a JTA environment, and you must first specify hibernate.transaction.manager_lookup_class.
  Taigi jei norėtume pridėti `Read-Write` strategijos second-level cache prie Entity objekto darytume taip:
+ 
  ```java
 @Entity
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -292,3 +295,9 @@ arba į hibernate.properties: `hibernate.cache.provider_class=org.hibernate.cach
 
 Tokiu būdu mes įjungėm second-level caching valdoma EHCache providerio su Employee objektu skaitymu tvarkomo `read-write` concurrency strategy tipo algoritmu.
 
+#####  Keletas pagrindinių funkcijų
+
+* `session.flush()` - sinchronizuoja visus objektus užkešuotus pirmo lygio kešinge su duombaze.
+* `session.evict(Object)` - išima objektą iš pirmo lygio kešo.
+* `session.clear()` - išmeta visus objektus iš pirmo lygio kešo.
+* `session.getSessionFactory().getCache().evictQueryRegion( "<region_name>" )`  išmeta užklausas pagal duota regiona
