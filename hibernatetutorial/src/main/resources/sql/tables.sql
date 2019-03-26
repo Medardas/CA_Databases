@@ -3,6 +3,7 @@ drop table if exists Employee;
 drop table if exists Branch;
 drop table if exists Company;
 drop table if exists Address;
+drop table if exists Expense;
 
 create table Address
 (
@@ -42,6 +43,13 @@ create table Contact
   value        varchar(40),
   CONSTRAINT fk_contact_Person FOREIGN KEY (ref_id) REFERENCES Employee (id)
 );
+create table Expense
+(
+  id          int primary key AUTO_INCREMENT,
+  name        VARCHAR(30),
+  description VARCHAR(100),
+  date        DATE
+);
 
 
 insert into Address(street, city)
@@ -56,3 +64,7 @@ insert into Branch (name, company)
 values ('Vilnius HQ', 1);
 insert into Contact (ref_id, contact_type, value)
 values (1, 'mobile phone', '370');
+insert into Expense(name, description, date)
+values ('office party \'19', 'second annual get together of employees', DATE '2019-03-17');
+insert into Expense(name, description, date)
+values ('office party \'18', 'first annual get together of employees', DATE '2018-03-24');

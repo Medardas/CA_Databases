@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true"
          monitoring="autodetect" dynamicConfig="true">
@@ -13,6 +12,11 @@
     </defaultCache>
 
     <cache name="employee" maxEntriesLocalHeap="10000" eternal="false"
+           timeToIdleSeconds="5" timeToLiveSeconds="10">
+        <persistence strategy="localTempSwap"/>
+    </cache>
+
+    <cache name="expense" maxEntriesLocalHeap="10000" eternal="false"
            timeToIdleSeconds="5" timeToLiveSeconds="10">
         <persistence strategy="localTempSwap"/>
     </cache>

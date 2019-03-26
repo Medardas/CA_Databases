@@ -35,4 +35,14 @@ public class Company {
     public Set<Branch> getBranches() {
         return branches == null ? new HashSet<>() : branches;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\": " + id +
+                ", \"name\": \"" + name +
+                "\", \"address\": " + (address != null ? address.getId() : "null") +
+                ", \"branches\": \"" + branches +
+                "\"}";
+    }
 }

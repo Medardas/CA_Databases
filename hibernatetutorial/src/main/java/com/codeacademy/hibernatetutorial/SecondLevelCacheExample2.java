@@ -10,12 +10,10 @@ import org.hibernate.Transaction;
 import org.hibernate.stat.CacheRegionStatistics;
 import org.hibernate.stat.Statistics;
 
-import static com.codeacademy.hibernatetutorial.util.EntityCreator.*;
-
-public class SecondLevelCacheTest {
+public class SecondLevelCacheExample2 {
 
     private static Logger logger = Logger
-            .getLogger(SecondLevelCacheTest.class);
+            .getLogger(SecondLevelCacheExample2.class);
 
     public static void main(String[] args) {
         DOMConfigurator.configure("log4j.xml");
@@ -23,7 +21,7 @@ public class SecondLevelCacheTest {
         logger.log(AppLogger.APPLOGGER, "Temp Dir: " + System.getProperty("java.io.tmpdir"));
 
 
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory(null);
         //EntityCreator.deleteAllEmployeesFromId(sessionFactory.getCurrentSession(), 1);
         //setUpDatabase(sessionFactory.openSession());
 
@@ -37,20 +35,20 @@ public class SecondLevelCacheTest {
 
         printStats(stats, 0);
 
-        Employee emp = session.load(Employee.class, 3);
+        Employee emp = session.load(Employee.class, 10002);
         printData(emp, stats, 1);
 
-        emp = session.load(Employee.class, 3);
+        emp = session.load(Employee.class, 10002);
         printData(emp, stats, 2);
 
         session.evict(emp);
-        emp = session.load(Employee.class, 3);
+        emp = session.load(Employee.class, 10002);
         printData(emp, stats, 3);
 
-        emp = session.load(Employee.class, 5);
+        emp = session.load(Employee.class, 10003);
         printData(emp, stats, 4);
 
-        emp = otherSession.load(Employee.class, 3);
+        emp = otherSession.load(Employee.class, 10002);
         printData(emp, stats, 5);
 
         transaction.commit();
@@ -76,7 +74,7 @@ public class SecondLevelCacheTest {
         logger.log(AppLogger.APPLOGGER, count + ":: Name = " + emp.getName() + ", City = " + emp.getAddress().getCity());
         printStats(stats, count);
     }
-
+/*
     private static void setUpDatabase(Session session) {
         clearAddresses(session, 0);
         clearEmployees(session, 0);
@@ -86,5 +84,5 @@ public class SecondLevelCacheTest {
         session.save(createEmployeeInCompany());
         session.getTransaction().commit();
         session.close();
-    }
+    }*/
 }

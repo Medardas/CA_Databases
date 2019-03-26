@@ -100,7 +100,10 @@ public class EntityCreator {
 
     public static void deleteAllEmployeesFromId(Session session, int idToDeleteFrom) {
         session.getTransaction().begin();
-        Query<Employee> query = session.createQuery("SELECT e FROM Employee e WHERE e.id >= :idToDeleteFrom");
+        Query<Employee> query = session
+                .createQuery(
+                        "SELECT e FROM Employee e " +
+                                "WHERE e.id >= :idToDeleteFrom");
         query.setParameter("idToDeleteFrom", idToDeleteFrom);
         List<Employee> employeeIds = query.list();
         for (int i = 0; i < employeeIds.size(); i++) {
