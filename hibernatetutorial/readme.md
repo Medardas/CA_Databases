@@ -237,10 +237,24 @@ naudoti kai norima nustatyti kokiam stulpeliui kriterijus turi tikti. Stulpelį 
 
 ### Caching
 
- Caching yra mechanizmas kuris šiek tiek pagreitina užklausų rezultatų gavima. Tai yra sistema kuri egzistuoja tarp aplikacijos ir duombazės
- ir saugo najausias užklausas atėjusias iš kliento. Jei nepraeina labai daug laiko rezultatai į tokias pačias naujas užklausas yra gražinami tiesiai iš cache ir nėra ištikrųjų siunčiami į duombazę taip sutaupant daug laiko.
+ `Caching` (kešavimas) yra mechanizmas kuris šiek tiek pagreitina užklausų rezultatų gavima. Tai yra sistema kuri egzistuoja tarp aplikacijos ir duombazės
+ ir saugo naujausias užklausas siųstas iš kliento. Jei nepraeina nustatytas laikas rezultatai į tokias pačias užklausas yra gražinami tiesiai iš kešo ir nėra ištikrųjų siunčiami į duombazę taip sutaupant daug laiko.
  
  ![communication using hibernate](https://i.imgur.com/APtFgNZ.jpg) 
+ 
+ ##### Kaip kešavimas veikia?
+ 
+ Hibernate framework'e yra du kešavimo lygiai: 1st level cache ir 2nd level cache. Pirmas kešavimo lygis yra įjungtas automatiškai, antrą lygį reikia sukonfiguruoti. 
+ Jei abi kešavimo sistemos įjungtos ENtity paieška veikia taip:
+ * Kiekvieną kartą kai hibernate sesija bando užkrauti `Entity` pirmas dalykas kur ji žiuri tai yra pirmo lygio kešas kuris tvarkomas `Session` objekte.
+ * Jei toks enity egzistuoja pirmame lygije tuomet tas jis yra tiesiog gražinamas kaip rezultatas.
+ * Jei to enity nėra pirmo lygio keše tuomet yra žiūrima į antro lygio kešą.
+ * Jei šis enity egzistuoja antro lygio keše - jis gražinamas kaip rezultatas. Tačiau prieš tai padarant objektas taip pat yra išaugotas pirmo lygio keše, kad nereikėtų daryti vėl paieškos antrą kartą.
+ * Jei Enity neegzisutoja neiviename keše, užklausa į duombazę yra išsiunčiama. Gautas rezultatas yra įrašomas į abu kešo lygius. 
+ * Antro lygio kešavimo sistema atnaujinta pakeistą objektą, jei pakeitimas buvo daromas naudojant hibernate sesijos api.
+ * Jei įrašai duombazėje pasikteitė per laiką kol neišseko enity kešavimo nustatymas `timeToLiveSeconds` - kešavimo sistemai nėra kaip žinoti apie tą pasikeitimą ir tiesiog senas rezultatas bus gražintas iš kešo.
+ 
+ If some user or process make changes directly in database, the there is no way that second level cache update itself until “timeToLiveSeconds” duration has passed for that cache region. In this case, it is good idea to invalidate whole cache and let hibernate build its cache once again. You can use below code snippet to invalidate whole hibernate second level cache.
  
  ##### 1. First-level cache
  
@@ -257,20 +271,24 @@ naudoti kai norima nustatyti kokiam stulpeliui kriterijus turi tikti. Stulpelį 
  
  ##### 2. Second-level cache
  
- Tai yra antro lygio cache kuri galima sukonfiguruoti laikyti tik tam tikro `Entity` detales, užklausas, taip pat galima 
- pasirūpinti, kad cache būtų išsaugotas net ir išnaujo prisijungus naudojant tą patį `Session` objektą.
+ Antro lygio cache (kešas) galima sukonfiguruoti laikyti tik tam tikro `Entity` detales, užklausas, taip pat pasirūpinti
+ , kad cache būtų išsaugotas `Session` objekte net ir išnaujo prisijungus.
  
  Prieš įjungiant second-level caching pirmiausia turim nutarti kelis dalykus.
- Reikia išsirinkti `Concurrency Strategy` tai yra algoritmas kurį pasirinksim manipuliuoti objektams duombazėje:
+ Pirmiausia reikia išsirinkti `Concurrency Strategy` tai yra algoritmas kurį pasirinksim manipuliuoti objektams egzistuojantiems keše:
  
- * read-only - A read-only cache is good for data that needs to be read often but not modified. It is simple, performs well, and is safe to use in a clustered environment.
-   
- * nonstrict read-write - Some applications only rarely need to modify data. This is the case if two transactions are unlikely to try to update the same item simultaneously. In this case, you do not need strict transaction isolation, and a nonstrict-read-write cache might be appropriate. If the cache is used in a JTA environment, you must specify hibernate.transaction.manager_lookup_class. In other environments, ensore that the transaction is complete before you call Session.close() or Session.disconnect().
-   
- * read-write - A read-write cache is appropriate for an application which needs to update data regularly. Do not use a read-write strategy if you need serializable transaction isolation. In a JTA environment, specify a strategy for obtaining the JTA TransactionManager by setting the property hibernate.transaction.manager_lookup_class. In non-JTA environments, be sure the transaction is complete before you call Session.close() or Session.disconnect().
+ * read-only - tokio tipo kešas gerai tinka situacijoms kur dirbama su objektais kuriuos dažnai skaitom bet nemodifikuojam.
+ Ši strategija yra ganėtinai paprasta ir greita.
  
- * transactional - The transactional cache strategy provides support for transactional cache providers such as JBoss TreeCache. You can only use such a cache in a JTA environment, and you must first specify hibernate.transaction.manager_lookup_class.
- Taigi jei norėtume pridėti `Read-Write` strategijos second-level cache prie Entity objekto darytume taip:
+ * nonstrict read-write - kaikurios aplikacijos tik kartais turi modifikuoti informaciją. Dėl to sitiuacijų kur du skirtingi sistemos komponentai
+ bandytų pakeisti tą patį objektą vienu metu nelabai tikėtinos. Taigi tokiom situacijom tinka `nonstrict read-write` strategija.
+   
+ * read-write - tokia kešinmo strategija yra geriausia kai programa dažnai turi keisti informaciją. 
+ 
+  
+ * transactional - tokia strategija palaiko tam tikrus kešo privider'ius tokius kaip JBossTreeCache kuie turi savo distinktyviū informacijos kešinimo aspektų.
+   
+Taigi jei norėtume pridėti `Read-Write` strategijos second-level cache prie Entity objekto darytume taip:
  
  ```java
 @Entity
