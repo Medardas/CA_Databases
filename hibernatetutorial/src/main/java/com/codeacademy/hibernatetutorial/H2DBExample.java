@@ -9,9 +9,9 @@ import java.util.List;
 
 public class H2DBExample {
 
-    public static void main(String[] theory) throws InterruptedException {
+    public static void main(String[] theory) {
         SessionFactory sessionFactory = HibernateUtil
-                .buildSessionFactory("hibernate.cfg.h2tut.xml");
+                .buildSessionFactory("hibernate.cfg.H2DBExample.xml");
         Session session = sessionFactory.openSession();
         session.getTransaction().begin();
 
@@ -20,6 +20,7 @@ public class H2DBExample {
         session.save(company);
 
         session.getTransaction().commit();
+
         List<Company> companies = session.createQuery("from Company").list();
         System.out.println("Companies: " + companies);
 

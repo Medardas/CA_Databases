@@ -14,7 +14,7 @@ import static com.codeacademy.hibernatetutorial.util.EntityCreator.*;
 
 public class SecondLevelCacheExample {
 
-    private static Logger logger = LoggerCreator.buildLogger(FirstLevelCachingExample.class);
+    private static Logger logger = LoggerCreator.buildLogger(SecondLevelCacheExample.class);
     private static SessionFactory sessionFactory = HibernateUtil.buildSessionFactory("hibernate.cfg.SecondLevelCacheExample.xml");
 
     public static void main(String[] args) {
@@ -25,8 +25,6 @@ public class SecondLevelCacheExample {
 
         Session session = sessionFactory.openSession();
         Session otherSession = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        Transaction otherTransaction = otherSession.beginTransaction();
 
         Utils.printStats(logger, stats, 0);
 
@@ -46,8 +44,6 @@ public class SecondLevelCacheExample {
         emp = otherSession.load(Employee.class, 10002);
         Utils.printData(logger, emp, stats, 5);
 
-        transaction.commit();
-        otherTransaction.commit();
         sessionFactory.close();
     }
 
