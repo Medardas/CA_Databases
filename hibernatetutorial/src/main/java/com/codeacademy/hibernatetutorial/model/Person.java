@@ -14,7 +14,7 @@ public class Person {
     private int id;
     private String name;
     private int age;
-    @OneToOne(mappedBy = "person")
+    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private Salary salary;
 
 }

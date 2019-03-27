@@ -1,20 +1,33 @@
 package com.codeacademy.hibernatetutorial.model;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 
 @Entity
-@Data
 @NoArgsConstructor
 public class Salary {
+    @Getter
     @Id
     private int personId;
 
+    @Setter
+    @Getter
     private int pay;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn(name = "personId", referencedColumnName = "id")
+    @Setter
+    @OneToOne
+    @MapsId
+    // pasako hibernate naudoti Salary "personId" identifikaciją kaip primary key ir foreign key nurodytam Entity.
     private Person person;
+
+    public Person getPerson() {
+        return person;
+    }
+
 }
