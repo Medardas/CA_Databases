@@ -7,7 +7,6 @@ import com.codeacademy.hibernatetutorial.util.Utils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.stat.Statistics;
 
 import static com.codeacademy.hibernatetutorial.util.EntityCreator.*;
@@ -51,9 +50,9 @@ public class SecondLevelCacheExample {
         clearAddresses(session, 0);
         clearEmployees(session, 0);
         session.getTransaction().begin();
-        session.save(createEmployeeInCompany());
-        session.save(createEmployeeInCompany());
-        session.save(createEmployeeInCompany());
+        session.save(createEmployeeWithAddress());
+        session.save(createEmployeeWithAddress());
+        session.save(createEmployeeWithAddress());
         session.getTransaction().commit();
         session.close();
     }
