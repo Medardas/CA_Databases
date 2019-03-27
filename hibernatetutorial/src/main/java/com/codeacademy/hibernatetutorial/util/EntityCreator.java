@@ -1,6 +1,6 @@
 package com.codeacademy.hibernatetutorial.util;
 
-import com.codeacademy.hibernatetutorial.AppLogger;
+import com.codeacademy.hibernatetutorial.logger.AppLoggerLevel;
 import com.codeacademy.hibernatetutorial.model.Address;
 import com.codeacademy.hibernatetutorial.model.Company;
 import com.codeacademy.hibernatetutorial.model.Employee;
@@ -109,7 +109,7 @@ public class EntityCreator {
         for (int i = 0; i < employeeIds.size(); i++) {
             session.delete(employeeIds.get(i));
         }
-        logger.log(AppLogger.APPLOGGER, " Employees deleted:" + employeeIds);
+        logger.log(AppLoggerLevel.APPLOGGER, " Employees deleted:" + employeeIds);
         session.getTransaction().commit();
     }
 

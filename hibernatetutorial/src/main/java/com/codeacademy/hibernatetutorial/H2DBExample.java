@@ -11,7 +11,7 @@ public class H2DBExample {
 
     public static void main(String[] theory) throws InterruptedException {
         SessionFactory sessionFactory = HibernateUtil
-                .getSessionFactory("hibernate.cfg.h2tut.xml");
+                .buildSessionFactory("hibernate.cfg.h2tut.xml");
         Session session = sessionFactory.openSession();
         session.getTransaction().begin();
 

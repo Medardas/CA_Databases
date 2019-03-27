@@ -23,13 +23,10 @@
         <property name="hibernate.javax.cache.provider">org.ehcache.jsr107.EhcacheCachingProvider</property>
         <property name="hibernate.cache.use_second_level_cache">true</property>
         <property name="hibernate.cache.use_query_cache">true</property>
-        <!--<property name="net.sf.ehcache.configurationResourceName">/ehcacheconfig.xml</property>-->
-        <!--<property name="hibernate.javax.cache.missing_cache_strategy">create</property>-->
+        <property name="hibernate.javax.cache.missing_cache_strategy">create</property>
+        <!--<property name="net.sf.ehcache.configurationResourceName">/ehcache.xml</property>-->
 
-        <!---->
-        <!--        <property name="hbm2ddl.auto">create</property>-->
-        <!--<property name="hibernate.hbm2ddl.import_files">
-            sql/tables.sql
-        </property>-->
+        <!--<property name="hbm2ddl.auto">create</property>-->
+        <!--<property name="hibernate.hbm2ddl.import_files">sql/tables.sql</property>-->
     </session-factory>
 </hibernate-configuration>
