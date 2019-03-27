@@ -50,7 +50,8 @@ public class Utils {
     }
 
     public static void printData(Logger logger, Employee emp, Statistics stats, int count) {
-        logger.log(AppLoggerLevel.APPLOGGER, count + ":: Name = " + emp.getName() + ", City = " + emp.getAddress().getCity());
+        String city = emp.getAddress() == null ? null : emp.getAddress().getCity();
+        logger.log(AppLoggerLevel.APPLOGGER, count + ":: Name = " + emp.getName() + ", City = " + city);
         printStats(logger, stats, count);
     }
 

@@ -15,3 +15,4 @@ lagviau plečiamos (`scaling`) ir yra bendrai lankstesnės. Tai yra non-relation
   * Data models: Skirtingai nuo relational, schemos NoSQL duombazėje yra daug lankstesnės. To rezultatas yra daug paprastesnė įrašų manipuliacija ir duombazės prisitaikymas priklausomai nuo sistemos reikalavimų.
   * Data structure: Non-relational duombazių dizainas leidžia tokiom duombazės laikyti nestrukturizuotus įrašus kurių nebutinai įmanoma gražiai sudėti į lenteles ir stulplelius. Tokia struktura yra svarbi nes dauguma datos sugeneruota šiais laikais yra nestrukturizuota. 
 
+
