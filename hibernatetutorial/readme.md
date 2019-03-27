@@ -7,6 +7,16 @@
  * HQL
  * Criteria
  * Caching
+ * Related or often used together frameworks: 
+    * H2 in memmory database 
+    * Log4j logging library
+ 
+Šiame projekte galima rasti pavyzdžių egzistuojančių java main klasėse kurių pavadinimai baigias `*Example`. 
+Hibernate konfiguracijos failai `hibernate.cfg.*.xml` turi atitinkamus pavadinimus kiekvienai main klasei.
+
+Nors ir nesusiję su duombazėms, taip pat gera įdėja būtų panagrinėti `log`'inimo konfiguraciją ir bendra implementaciją.
+
+`util` paketas turi `utility` klasės kurios padeda atlikti tam tikrus paprastus veiksmus pavyzdžiams, tokius kaip sesijos sukurimas ar darbuotojų ištrinimas iš duombazės.
  
  ### Configuration
  Gali būti daug konfiguracijos būdų:

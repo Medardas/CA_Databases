@@ -19,6 +19,7 @@ public class HibernateUtil {
 
     public static SessionFactory buildSessionFactory(String config) {
         try {
+            //Pridedam visus enity prie konfiguracijos tam, kad hibernate žinotu su kuo dirbti.
             Configuration configuration = new Configuration()
                     .addAnnotatedClass(Company.class)
                     .addAnnotatedClass(Employee.class)

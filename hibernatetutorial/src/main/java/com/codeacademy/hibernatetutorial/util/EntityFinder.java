@@ -10,6 +10,13 @@ import javax.persistence.criteria.Root;
 
 public class EntityFinder {
 
+    /**
+     * Randa darbuotoją pagal duotą vardą.
+     *
+     * @param session - sesija kurioje atlikti paiešką
+     * @param name    - vardas pagal kurį ieškoti.
+     * @return - rastą darbuotojo objektą
+     */
     public static Employee findEmployeeByName(Session session, String name) {
         CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<Employee> criteriaFindByName = criteriaBuilder.createQuery(Employee.class);
@@ -18,6 +25,12 @@ public class EntityFinder {
         return session.createQuery(criteriaFindByName).getSingleResult();
     }
 
+    /**
+     * Randa adresą pagal duotą gatvė.
+     * @param session - sesija kurioje atlikti paiešką
+     * @param street - gatvė pagal kurią ieškoti
+     * @return - rastą adreso objektą
+     */
     public static Address findAddressByStreet(Session session, String street) {
         CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<Address> criteriaFindByStreet = criteriaBuilder.createQuery(Address.class);
