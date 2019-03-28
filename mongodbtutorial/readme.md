@@ -34,9 +34,10 @@ db.createCollection('firstCollection');
 MongoDB gali laikyti beveik betkokį JSON dokumentą betkokioje kolekcijoje, o jo įrašymas per konsolę atrodytų taip:
 
 ```javascript
-db.firstCollection.insertOne({name:'Medardas',skill:'not MongoDB'});
+db.firstCollection.insertOne({name:'Medardas',skill:'MongoDB'});
 ```
 Kai dokumentas yra įdedamas į duombazę, jam yra sugeneruojamas unikalus ID kurį nuo šiol matysit suradę dokumentą.
+Taip pat atkreipkit dėmesį, kad ši generuota reikšmė prasideda su `_`, taigi apatinio brukšnelio bei "/" ir "$" elementų ženklinimas yra rezervuotas pačios MongoDB duombazės vidiniam naudojimui.
 
 ##### Find
 
@@ -52,6 +53,25 @@ db.firstCollection.find({name:'Medardas'});
 Apie šia funkciją galima galvoti kaip apie `SELECT` užklausą SQL duombazėje kur kaikuriuos `WHERE` loginius lyginimus mes perduodam kaip argumentus.
 Taigi šiuo atvėju funkcija ieškotų visų dokumentų kolekcijoje `firstCollection` ir gražintų visus kur yra laukas `name` su reikšme `Medardas`. Beja paieška yra case sensitive.
 
+Norint rasti objektus objektuose galima naudoti raktų seką vedančia iki ieškomos reikšmės. Jei yra toks objektas: 
+```json
+{
+  name: "Medardas",
+  skill: "MongoDB",
+  address: {
+    city: "Vilnius",
+    country: "Lithuania",
+    distance: 30
+  }
+}
+```
+Norint rasti `city` reiktu pirmiausia parašyti pirmo lygio raktą - `address`, tada, po taško, antro lygio - `city`. Taip galima ieškoti per kiek nori lygių.
+Taigi rasti dokumentą parodytą aukščiau galima taip:
+```javascript
+db.firstCollection.find({"address.city":"Medardas"});
+```
+
+
 Laukų skaičius pagal kuriuos ieškoti neturi ribų, taigi iš principo jūsų paieškos objektas gali būti tiek didelis kiek reikia.
 
 ###### Projection
@@ -64,14 +84,19 @@ db.firstCollection.find({name:"Medardas"},{_id: 0, skill:1});
 ```
 Gražintų:
 ```json
-{ "skill" : "not MongoDB" }
+{ "skill" : "MongoDB" }
 ```
 ###### Regex
 
-Find funkcija tiap pat supranta paieškos objektus su regex'ais. Taigi norint rasti visus dokumentus kur egzistuoja skill'as turintis "Mongo" savyje galyma rašyti taip:
+Find funkcija taip pat supranta paieškos objektus su regex'ais kuriuos reikia įrašyti tarp `/` ženklų. 
+Pavyzdžiui norint rasti visus dokumentus kur egzistuoja skill'as turintis "Mongo" savyje galyma rašyti taip:
 ```javascript
-db.firstCollection.find({skill:/.*Mongo.*/})
+db.firstCollection.find({skill:/.*Mongo.*/}) //Regexas `.*` prisilygina nuliui ir daugiau betkokių ženklų.
 ```
+Pora regexo pavyzdžių:
+* `tekstas$` lyginasi su visomis reikšmėmis kurios baigiasi būtent žodžiu `tekstas`
+* `^tekstas` lyginasi su visomis reikšmėmis kurios prasideda žodžiu `tekstas`
+
 
 ###### Loginės operacijos
 
@@ -91,3 +116,45 @@ Logical operatoriai yra tokie:
   * nor - turi netikti neivienas išsireiškimas
   * or - gali tikti betkuris išsireiškimas
 
+###### Lyginamosios operacijos
+
+
+Operator	Use	Example
+ * `$eq`  	Tikrina ar reikšmės yra lygios. Pavizdys: 	                            `{skill:{$eq:"MongoDB"}}`
+ * `$lt`  	Tikrina ar reikšmės yra  mažiau. Pavizdys: 	                            `{"address.distance": {$lt:20}}`
+ * `$gte`  	Tikrina ar reikšmės yra  daugia arba lygu. Pavizdys: 	                `{"address.distance":{$gte:22}}`
+ * `$lte`  	Tikrina ar reikšmės yra mažiau arba lygu. Pavizdys:	                    `{"address.distance":{$lte:22}}`
+ * `$ne`  	Tikrina ar reikšmės yra nelygi duotai reikšmei. Pavizdys:	            `{"address.distance":{$ne:22}}`
+ * `$in`  	Tikrina ar reikšmės yra lygi bent vienai reikšmei masyve. Pavizdys:	    `{"address.distance":{$in:[20,30]}}`
+ * `$nin` 	Tikrina ar reikšmės yra nelygi reikšmėms masyve. Pavizdys: 	            `{"address.distance":{$nin:[22,25]}}`
+
+### Java setup
+
+Prisijungimas prie MongoDB duombazės su standartine konfiguraciją yra begalo lengvas nesvarbu ar tai `Compass`
+ ar Java klientas. Java'i viskas ko reikia tvarkyti jungčiai tai yra sukurti vieną objektą be jokių parametrų kaip toliau pamatysite. 
+
+Taigi pirmiausia reikia vienos vienintelės bibliotekos:
+```xml
+<dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>mongo-java-driver</artifactId>
+    <version>3.10.1</version>
+</dependency>
+```
+
+Kai šią biblioteką turite, norint pradėti dirbti su duombaze pirmiausia reikia prisijungti prie serverio. Tai pradėti daryti galima sukuriant klientą:
+```java
+MongoClient mongoClient = MongoDBUtil.createMongoClient();
+```
+Taigi, dabar jūsų Javos aplikacija žino apie serverį kuris yra `localhost:27017` kur ir prisijungimui bus naudojamas pradinis `admin` naudotojas.
+
+Tačiau kitas dalykas ko mums reikia tai būtent duombazė sukuria dirbti. Taip kuriamas objektas kuris tvarko duombazei specifišką jungtį:
+```java
+MongoDatabase database = mongoClient.getDatabase("tutorial");
+```
+Na o jau dabar galima pradėti dirbti su kolekcija kurią galima gauti taip:
+```java
+MongoCollection<Document> collection = database.getCollection("firstCollection");
+```
+
+Pažiūrėti ar viskas gerai veikia galima panaudojus funkciją `collection.countDocuments()` kuri grąžiną dokumentų skaičių kolekcijoje.
