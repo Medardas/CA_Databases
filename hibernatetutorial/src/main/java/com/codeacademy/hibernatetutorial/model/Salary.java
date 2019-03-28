@@ -18,9 +18,9 @@ public class Salary {
     private int pay;
 
     @Setter
-// pasako hibernate naudoti Salary "personId" identifikaciją kaip primary key ir foreign key nurodytam Entity.
     @OneToOne
     @JoinColumn(name = "person_id")
+    // pasako hibernate naudoti Salary "personId" identifikaciją kaip primary key ir foreign key nurodytam Entity.
     @MapsId
     private Person person;
 
