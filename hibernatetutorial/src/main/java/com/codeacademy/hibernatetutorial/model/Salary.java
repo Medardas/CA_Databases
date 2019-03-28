@@ -1,15 +1,11 @@
 package com.codeacademy.hibernatetutorial.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
+@RequiredArgsConstructor
 @NoArgsConstructor
 public class Salary {
     @Getter
@@ -18,12 +14,14 @@ public class Salary {
 
     @Setter
     @Getter
+    @NonNull
     private int pay;
 
     @Setter
+// pasako hibernate naudoti Salary "personId" identifikaciją kaip primary key ir foreign key nurodytam Entity.
     @OneToOne
+    @JoinColumn(name = "person_id")
     @MapsId
-    // pasako hibernate naudoti Salary "personId" identifikaciją kaip primary key ir foreign key nurodytam Entity.
     private Person person;
 
     public Person getPerson() {

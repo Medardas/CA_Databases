@@ -3,6 +3,7 @@ package com.codeacademy.hibernatetutorial.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 @Data
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "employee")
 @NoArgsConstructor
+@ToString(exclude = {"group"})
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
