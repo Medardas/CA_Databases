@@ -128,7 +128,9 @@ Operator	Use	Example
  * `$in`  	Tikrina ar reikšmės yra lygi bent vienai reikšmei masyve. Pavizdys:	    `{"address.distance":{$in:[20,30]}}`
  * `$nin` 	Tikrina ar reikšmės yra nelygi reikšmėms masyve. Pavizdys: 	            `{"address.distance":{$nin:[22,25]}}`
 
-### Java setup
+# Java and MongoDB
+
+### Setup
 
 Prisijungimas prie MongoDB duombazės su standartine konfiguraciją yra begalo lengvas nesvarbu ar tai `Compass`
  ar Java klientas. Java'i viskas ko reikia tvarkyti jungčiai tai yra sukurti vieną objektą be jokių parametrų kaip toliau pamatysite. 
@@ -158,3 +160,27 @@ MongoCollection<Document> collection = database.getCollection("firstCollection")
 ```
 
 Pažiūrėti ar viskas gerai veikia galima panaudojus funkciją `collection.countDocuments()` kuri grąžiną dokumentų skaičių kolekcijoje.
+
+### Document saving
+
+Kuriant `MongoCollection` yra paduodamas generic'as su kuriuo kolekcijos objektas gali dirbti, pavyzdžiui įrašyti į duombazę.
+Taigi sukurti tokį objektą galima taip:   
+```java
+Document person = new Document("name", "Medardas")
+                .append("skill", "MongoDB");
+```
+Čia konstruktorius priima dvi reikšmes: raktą ir reikšmė kurios bus rezultato JSON objekte.
+Daugiau raktų galima pridėti su `append(String, Object)` funkcija.
+Tokio javos objekto `marshalling` (objekto pakeitimas iš vieno formato į kitą) būtų toks JSON objektas:
+```json
+{
+  name: "Medardas",
+  skill: "MongoDB"
+}
+```
+Išsaugojimas atrodytų taip:
+```java
+collection.insertOne(person);
+```
+Ši funkcija įrašo vieną objektą į kolekciją, taip pat naudojant `insertMany(List)` galima įdėti visą sarašą dokumentų.
+MongoDB api standartiškai neliepia programuotojams rūpintis transakcijų atomiškumu darant operacijas su vienu dokumentu, taigi kurti naujų transakcijų ir jas uždarinėti dar nereikia. 
